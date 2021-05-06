@@ -4,7 +4,11 @@ import './App.css';
 
 import getData from './callApi/getData'
 
+import listSubject from './resource/listSubject'
+
 const { Option } = Select;
+const { TextArea } = Input;
+
 
 const layout = {
   labelCol: {
@@ -23,40 +27,8 @@ class App extends Component{
   constructor(){
     super();
     this.state = {
-      listSubject: {
-        math: {
-          subject: "Math",
-          icon: 
-        },
-        english: {
-          subject: "Endlist",
-          icon:
-        },
-        literature: {
-          subject: "Literature",
-          icon:
-        },
-        chemistry: {
-          subject: "Chemistry",
-          icon:
-        },
-        biology: {
-          subject: "Biology",
-          icon:
-        },
-        history: {
-          subject: "History",
-          icon:
-        },
-        geography: {
-          subject: "Geography",
-          icon:
-        },
-        casioMath: {
-          subject: "Casio Math",
-          icon:
-        }
-      }
+      subjectModal: listSubject,
+      authenKey: ""
     }
   }
 
@@ -69,20 +41,22 @@ class App extends Component{
       </div>
     );    
   }
-
-  componentDidMount(){
-    getData("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNjIwMTIxODc3LCJpYXQiOjE2MjAxMTgyNzcsInYiOjB9.8b4cPpaGXIzFJuxjz8FGTWatcm1-iunkCXO8uwUBmGw").then(json => {
-      this.setState({
-        documentQuery: json[Object.keys(json)[0]],
-        testQuery: json[Object.keys(json)[1]]
-      })
-    })
-  }
-
   _renderInputForm = () => {
     return(
       <div className="wrap-form-input">
-        <Form {...layout} name="control-ref" className="form-input">
+        <Form span={8} name="control-ref" className="form-input">
+          <Form.Item 
+            name="auth"
+            label="Authen"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input
+              onChange={(e) => this.getAuthenKey(e)} />
+          </Form.Item>
           <Form.Item
             name="note"
             label="Summary"
@@ -171,9 +145,27 @@ class App extends Component{
   _renderOutputTextBox = () => {
     return(
       <div className="wrap-output-text-box">
-
+        <Form span={8} >
+          <TextArea rows={5}  copyable />
+        </Form>
       </div>
     )
+  }
+
+  getAuthenKey = (e) => {
+    let auth = e.target.value.trim();
+    this.setState({
+      authenKey: auth
+    }, () => {
+      getData(this.state.authenKey).then(json => {
+        this.setState({
+          documentQuery: json[Object.keys(json)[0]],
+          testQuery: json[Object.keys(json)[1]]
+        }, () => {
+          console.log(this.state)
+        })
+      })
+    })
   }
 }
 
